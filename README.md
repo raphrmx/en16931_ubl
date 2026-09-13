@@ -90,14 +90,17 @@ A credit note goes out under the CreditNote root, with `CreditNoteLine` and
 `isCreditNote` says which.
 
 Amounts are written with two decimals and the currency they are in. A unit
-price keeps the decimals it was given, because rounding it would change what
-is being sold.
+price keeps the decimals it was given.
 
 ## What it does not do
 
 It does not decide what an invoice has to contain: that is the model's
-business, and `validate` from `en16931` says whether it holds up. It does not
-send anything either.
+business, and `validate` from [en16931](https://pub.dev/packages/en16931) says
+whether it holds up. A network or a country puts its own rules on top of the
+standard, and those live in a profile package:
+[en16931_peppol](https://pub.dev/packages/en16931_peppol) for Peppol BIS
+Billing and [en16931_xrechnung](https://pub.dev/packages/en16931_xrechnung)
+for Germany. Sending the document is a different problem again.
 
 ## License
 
