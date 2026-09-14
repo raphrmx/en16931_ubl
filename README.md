@@ -16,7 +16,7 @@ and most of Europe reads.
 ```yaml
 dependencies:
   en16931: ^0.1.2
-  en16931_ubl: ^0.1.2
+  en16931_ubl: ^0.1.3
 ```
 
 ## Write an invoice out
@@ -77,6 +77,23 @@ for (final violation in validate(invoice)) {
 XML, a root that is neither an Invoice nor a CreditNote, and a document with
 no issue date. Those leave nothing to report on. Everything else is read as
 far as it goes.
+
+A document written beyond the standard is read as far as the standard goes,
+and no further. `readUblReporting` says what was left behind, which matters
+more than it sounds: an invoice whose lines carry lines of their own comes
+back with the parents only, still adds up, and passes.
+
+```dart
+final read = readUblReporting(xml);
+
+for (final element in read.skipped) {
+  print(element); // 56 x cac:SubInvoiceLine (a line under a line, which ...)
+}
+```
+
+`ublElementsBeyondTheModel` names what is looked for. It is a short list on
+purpose: a narrow signal that is true beats a wide one that cries wolf over
+every element the reader is right to ignore.
 
 ## Worth knowing up front
 

@@ -1,3 +1,16 @@
+## 0.1.3
+
+- Several payment accounts (BG-17 repeated) are written and read. UBL carries
+  one account to a payment means, so an invoice offering two writes the group
+  twice; both sides put them all in one group, so a document offering two
+  accounts came back offering one and nothing complained. The standard's own
+  first example is written that way.
+- `readUblReporting` gives back the invoice and what the document carried that
+  the model has no room for. `readUbl` says nothing about it, which is fine
+  for a document written to the standard and a trap for one written beyond
+  it: an invoice of fifty-seven lines comes back with one, adds up, and
+  passes. `ublElementsBeyondTheModel` names what is looked for.
+
 ## 0.1.2
 
 - The README says that delivery is a separate choice, where it used to end on

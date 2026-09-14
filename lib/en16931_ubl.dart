@@ -7,4 +7,6 @@
 library;
 
 export 'src/reader.dart' show UblFormatException, readUbl;
+export 'src/report.dart'
+    show SkippedElement, UblRead, readUblReporting, ublElementsBeyondTheModel;
 export 'src/writer.dart' show isCreditNote, ublCreditNote, ublInvoice, writeUbl;

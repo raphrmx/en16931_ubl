@@ -384,47 +384,18 @@ void _delivery(XmlBuilder b, Invoice invoice) {
 void _payment(XmlBuilder b, Invoice invoice, String currency) {
   final instructions = invoice.paymentInstructions;
   if (instructions != null) {
-    _group(b, 'PaymentMeans', () {
-      b.element(
-        'PaymentMeansCode',
-        namespaceUri: _cbc,
-        attributes: {
-          if (instructions.meansText != null) 'name': instructions.meansText!,
-        },
-        nest: instructions.means.value,
-      );
-      _text(b, 'PaymentID', instructions.remittanceInformation);
-      final card = instructions.card;
-      if (card != null) {
-        _group(b, 'CardAccount', () {
-          _text(b, 'PrimaryAccountNumberID', card.primaryAccountNumber);
-          _text(b, 'NetworkID', 'NA');
-          _text(b, 'HolderName', card.holderName);
-        });
+    // UBL carries one account to a payment means, so an invoice offering
+    // several accounts (BG-17 repeats) writes the group again rather than the
+    // account again. The card and the mandate belong to the payment as a
+    // whole and go with the first.
+    final accounts = instructions.creditTransfers;
+    if (accounts.isEmpty) {
+      _paymentMeans(b, instructions, null, carryTheRest: true);
+    } else {
+      for (final (index, account) in accounts.indexed) {
+        _paymentMeans(b, instructions, account, carryTheRest: index == 0);
       }
-      for (final account in instructions.creditTransfers) {
-        _group(b, 'PayeeFinancialAccount', () {
-          _text(b, 'ID', account.identifier);
-          _text(b, 'Name', account.name);
-          if (account.providerBic != null) {
-            _group(b, 'FinancialInstitutionBranch', () {
-              _text(b, 'ID', account.providerBic);
-            });
-          }
-        });
-      }
-      final debit = instructions.directDebit;
-      if (debit != null) {
-        _group(b, 'PaymentMandate', () {
-          _text(b, 'ID', debit.mandateReference);
-          if (debit.debitedAccountIdentifier != null) {
-            _group(b, 'PayerFinancialAccount', () {
-              _text(b, 'ID', debit.debitedAccountIdentifier);
-            });
-          }
-        });
-      }
-    });
+    }
   }
 
   if (invoice.paymentTerms != null) {
@@ -697,4 +668,59 @@ void _amount(
     attributes: {'currencyID': currency},
     nest: exactScale ? value.toString() : value.toStringAsFixed(2),
   );
+}
+
+/// One payment means: how the invoice is paid, and one account it is paid to.
+///
+/// The means code and the remittance reference are repeated in every group,
+/// which is what the published examples do and what lets a reader take them
+/// from whichever group it meets first. [carryTheRest] marks the group that
+/// also carries the card and the mandate, so neither is written twice.
+void _paymentMeans(
+  XmlBuilder b,
+  PaymentInstructions instructions,
+  CreditTransferAccount? account, {
+  required bool carryTheRest,
+}) {
+  _group(b, 'PaymentMeans', () {
+    b.element(
+      'PaymentMeansCode',
+      namespaceUri: _cbc,
+      attributes: {
+        if (instructions.meansText != null) 'name': instructions.meansText!,
+      },
+      nest: instructions.means.value,
+    );
+    _text(b, 'PaymentID', instructions.remittanceInformation);
+    final card = instructions.card;
+    if (carryTheRest && card != null) {
+      _group(b, 'CardAccount', () {
+        _text(b, 'PrimaryAccountNumberID', card.primaryAccountNumber);
+        _text(b, 'NetworkID', 'NA');
+        _text(b, 'HolderName', card.holderName);
+      });
+    }
+    if (account != null) {
+      _group(b, 'PayeeFinancialAccount', () {
+        _text(b, 'ID', account.identifier);
+        _text(b, 'Name', account.name);
+        if (account.providerBic != null) {
+          _group(b, 'FinancialInstitutionBranch', () {
+            _text(b, 'ID', account.providerBic);
+          });
+        }
+      });
+    }
+    final debit = instructions.directDebit;
+    if (carryTheRest && debit != null) {
+      _group(b, 'PaymentMandate', () {
+        _text(b, 'ID', debit.mandateReference);
+        if (debit.debitedAccountIdentifier != null) {
+          _group(b, 'PayerFinancialAccount', () {
+            _text(b, 'ID', debit.debitedAccountIdentifier);
+          });
+        }
+      });
+    }
+  });
 }

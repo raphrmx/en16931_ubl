@@ -321,23 +321,38 @@ Delivery? _delivery(XmlElement root) {
   );
 }
 
+/// BG-16, gathered from every payment means the document writes.
+///
+/// UBL carries one account to a payment means, so an invoice offering two
+/// accounts writes the group twice rather than the account twice. Reading
+/// only the first group gives back an invoice that offers one account where
+/// the sender offered several, and nothing complains: the rules count no
+/// accounts. The standard's own first example is written that way.
 PaymentInstructions? _payment(XmlElement root) {
-  final element = _child(root, 'PaymentMeans');
-  if (element == null) return null;
+  final groups = _children(root, 'PaymentMeans').toList();
+  if (groups.isEmpty) return null;
+  final element = groups.first;
   final code = _child(element, 'PaymentMeansCode');
-  final card = _child(element, 'CardAccount');
-  final mandate = _child(element, 'PaymentMandate');
+  final card = groups
+      .map((group) => _child(group, 'CardAccount'))
+      .nonNulls
+      .firstOrNull;
+  final mandate = groups
+      .map((group) => _child(group, 'PaymentMandate'))
+      .nonNulls
+      .firstOrNull;
   return PaymentInstructions(
     means: PaymentMeansCode(code?.innerText ?? ''),
     meansText: code?.getAttribute('name'),
     remittanceInformation: _text(element, 'PaymentID'),
     creditTransfers: [
-      for (final account in _children(element, 'PayeeFinancialAccount'))
-        CreditTransferAccount(
-          _text(account, 'ID') ?? '',
-          name: _text(account, 'Name'),
-          providerBic: _text(account, 'FinancialInstitutionBranch/ID'),
-        ),
+      for (final group in groups)
+        for (final account in _children(group, 'PayeeFinancialAccount'))
+          CreditTransferAccount(
+            _text(account, 'ID') ?? '',
+            name: _text(account, 'Name'),
+            providerBic: _text(account, 'FinancialInstitutionBranch/ID'),
+          ),
     ],
     card: card == null
         ? null
