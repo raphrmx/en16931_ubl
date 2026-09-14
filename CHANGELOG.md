@@ -7,6 +7,17 @@
 - `xml` moves to 7, which raises the Dart floor to 3.11. The writer names a
   namespace by its prefix and its URI in that order, where version 6 took them
   the other way round.
+- The creditor identifier (BT-90) is written and read. UBL gives it no
+  element of its own: it is a party identification of the seller under the
+  SEPA scheme, so it was lost on the way out and read back as a party
+  identifier on the way in, which refused a correct invoice under BR-CL-10.
+- The payment terms (BT-20) keep their whitespace. Every other term is
+  trimmed, but Germany reads a discount for early payment out of that text
+  line by line, and the line break closing the last one has to survive.
+- The payment terms keep their line breaks through the printer as well. A
+  pretty printed document reflows the text inside it, which is harmless
+  everywhere but here, and turned a valid German invoice into one that breaks
+  BR-DE-18.
 
 ## 0.1.1
 

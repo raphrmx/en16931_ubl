@@ -12,6 +12,12 @@ const String ublInvoice =
 const String ublCreditNote =
     'urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2';
 
+/// What UBL marks the creditor identifier (BT-90) with.
+///
+/// The term has no element of its own here: it is written as a party
+/// identification of the seller under this scheme, and read back from it.
+const String sepaScheme = 'SEPA';
+
 const String _cac =
     'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2';
 const String _cbc =
@@ -58,9 +64,25 @@ String writeUbl(Invoice invoice, {bool pretty = true}) {
 
   final document = builder.buildDocument();
   return pretty
-      ? document.toXmlString(pretty: true, indent: '  ')
+      ? document.toXmlString(
+          pretty: true,
+          indent: '  ',
+          preserveWhitespace: _significantWhitespace,
+        )
       : document.toXmlString();
 }
+
+/// Whether the space inside an element is part of what it says.
+///
+/// Printing an XML document for a human to read reflows the text inside it,
+/// which is harmless everywhere but one place. Germany writes a discount for
+/// early payment into the payment terms (BT-20) and reads it back line by
+/// line, so reflowing that element turns a valid invoice into one that breaks
+/// BR-DE-18.
+bool _significantWhitespace(XmlNode node) =>
+    node is XmlElement &&
+    node.name.local == 'Note' &&
+    node.parentElement?.name.local == 'PaymentTerms';
 
 /// Whether [code] is one of the type codes UBL carries as a credit note.
 bool isCreditNote(InvoiceTypeCode code) =>
@@ -186,6 +208,20 @@ void _parties(XmlBuilder b, Invoice invoice) {
       for (final identifier in seller.identifiers) {
         _group(b, 'PartyIdentification', () {
           _identifier(b, 'ID', identifier, schemeAttribute: 'schemeID');
+        });
+      }
+      // BT-90 has no element of its own in UBL. The creditor identifier is a
+      // party identification of the seller, marked as issued under SEPA.
+      final creditor =
+          invoice.paymentInstructions?.directDebit?.creditorIdentifier;
+      if (creditor != null) {
+        _group(b, 'PartyIdentification', () {
+          _identifier(
+            b,
+            'ID',
+            Identifier(creditor, scheme: sepaScheme),
+            schemeAttribute: 'schemeID',
+          );
         });
       }
       if (seller.tradingName != null) {

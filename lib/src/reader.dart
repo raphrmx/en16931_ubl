@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:decimal/decimal.dart';
 import 'package:en16931/en16931.dart';
+import 'package:en16931_ubl/src/writer.dart' show sepaScheme;
 import 'package:xml/xml.dart';
 
 /// A document that is not a UBL invoice this package can read.
@@ -90,7 +91,7 @@ Invoice readUbl(String xml) {
     taxRepresentative: _taxRepresentative(root),
     delivery: _delivery(root),
     paymentInstructions: _payment(root),
-    paymentTerms: _text(root, 'PaymentTerms/Note'),
+    paymentTerms: _verbatim(root, 'PaymentTerms/Note'),
     allowancesAndCharges: _documentEntries(root),
     vatBreakdown: _breakdown(root),
     totals: _totals(root),
@@ -191,7 +192,11 @@ Seller _seller(XmlElement root) {
     address: _address(_child(party, 'PostalAddress')),
     identifiers: [
       for (final identification in _children(party, 'PartyIdentification'))
-        ?_identifier(identification, 'ID', 'schemeID'),
+        // The creditor identifier (BT-90) sits among these under the SEPA
+        // scheme. It is not a party identifier, and reading it as one refuses
+        // the invoice under BR-CL-10 while losing the term it really is.
+        if (_scheme(identification) != sepaScheme)
+          ?_identifier(identification, 'ID', 'schemeID'),
     ],
     legalRegistrationIdentifier: _identifier(
       _child(party, 'PartyLegalEntity'),
@@ -344,6 +349,7 @@ PaymentInstructions? _payment(XmlElement root) {
         ? null
         : DirectDebit(
             mandateReference: _text(mandate, 'ID'),
+            creditorIdentifier: _creditorIdentifier(root),
             debitedAccountIdentifier: _text(
               mandate,
               'PayerFinancialAccount/ID',
@@ -602,4 +608,40 @@ Identifier? _identifier(
   final value = found.innerText.trim();
   if (value.isEmpty) return null;
   return Identifier(value, scheme: found.getAttribute(schemeAttribute));
+}
+
+/// BT-90, which UBL writes as a party identification under the SEPA scheme.
+///
+/// It belongs to the seller, and to the payee when there is one. Both are
+/// read, because a payee that collects the money is the party the mandate
+/// names.
+String? _creditorIdentifier(XmlElement root) {
+  for (final path in const ['AccountingSupplierParty/Party', 'PayeeParty']) {
+    final party = _child(root, path);
+    if (party == null) continue;
+    for (final identification in _children(party, 'PartyIdentification')) {
+      if (_scheme(identification) != sepaScheme) continue;
+      final value = _text(identification, 'ID');
+      if (value != null && value.trim().isNotEmpty) return value;
+    }
+  }
+  return null;
+}
+
+/// The scheme a party identification is issued under, or null when it gives
+/// none.
+String? _scheme(XmlElement identification) =>
+    _child(identification, 'ID')?.getAttribute('schemeID');
+
+/// A term whose whitespace is part of what it says.
+///
+/// Everything else is trimmed, because space around a value in XML is
+/// formatting. BT-20 is the exception: Germany writes a discount for early
+/// payment into that text and reads it back line by line, so the line break
+/// that closes the last one has to survive being read.
+String? _verbatim(XmlElement? element, String path) {
+  final found = _child(element, path);
+  if (found == null) return null;
+  final text = found.innerText;
+  return text.trim().isEmpty ? null : text;
 }
