@@ -2,10 +2,10 @@
 
 # EN 16931 UBL
 
-[![Build](https://img.shields.io/github/actions/workflow/status/raphrmx/en16931_ubl/ci.yml?branch=main&label=build)](https://github.com/raphrmx/en16931_ubl/actions/workflows/ci.yml)
+![Build](https://img.shields.io/github/actions/workflow/status/raphrmx/en16931_ubl/ci.yml?branch=main&label=build)
 [![Pub Version](https://img.shields.io/pub/v/en16931_ubl?color=blue)](https://pub.dev/packages/en16931_ubl)
 [![Maintainer](https://img.shields.io/badge/Maintainer-Raphael_Vrient-purple)](https://pub.dev/publishers/comapps.be/packages)
-[![License](https://img.shields.io/badge/Licence-MIT-blue)](/LICENSE)
+[![License](https://img.shields.io/badge/Licence-MIT-blue)](https://pub.dev/packages/en16931_ubl/license)
 ![Maintenance](https://img.shields.io/badge/Maintained-yes-success)
 
 Writes the European electronic invoice as UBL 2.1, the syntax Peppol carries
@@ -15,8 +15,8 @@ and most of Europe reads.
 
 ```yaml
 dependencies:
-  en16931: ^0.1.0
-  en16931_ubl: ^0.1.0
+  en16931: ^0.1.2
+  en16931_ubl: ^0.1.2
 ```
 
 ## Write an invoice out
@@ -100,8 +100,9 @@ whether it holds up. A network or a country puts its own rules on top of the
 standard, and those live in a profile package:
 [en16931_peppol](https://pub.dev/packages/en16931_peppol) for Peppol BIS
 Billing and [en16931_xrechnung](https://pub.dev/packages/en16931_xrechnung)
-for Germany. Sending the document is a different problem again.
+for Germany. Delivery is a separate choice: the same document goes over
+Peppol, through a portal, or as an attachment.
 
 ## License
 
-MIT.
+Released under the [MIT licence](https://pub.dev/packages/en16931_ubl/license).
