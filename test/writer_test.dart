@@ -21,27 +21,27 @@ Invoice _invoice({
   InvoiceTypeCode? typeCode,
   List<InvoiceLine>? lines,
   List<DocumentAllowanceCharge> allowancesAndCharges = const [],
-}) =>
-    Invoice.fromLines(
-      number: '2026-0042',
-      issueDate: DateTime(2026, 9, 13),
-      dueDate: DateTime(2026, 10, 13),
-      typeCode: typeCode ?? InvoiceTypeCode.commercialInvoice,
-      seller: _seller,
-      buyer: _buyer,
-      allowancesAndCharges: allowancesAndCharges,
-      lines: lines ??
-          [
-            InvoiceLine.of(
-              id: '1',
-              item: const Item(name: 'Consulting'),
-              quantity: 8,
-              unitPrice: 150.00,
-              vatRate: 21,
-              unit: UnitCode.hour,
-            ),
-          ],
-    );
+}) => Invoice.fromLines(
+  number: '2026-0042',
+  issueDate: DateTime(2026, 9, 13),
+  dueDate: DateTime(2026, 10, 13),
+  typeCode: typeCode ?? InvoiceTypeCode.commercialInvoice,
+  seller: _seller,
+  buyer: _buyer,
+  allowancesAndCharges: allowancesAndCharges,
+  lines:
+      lines ??
+      [
+        InvoiceLine.of(
+          id: '1',
+          item: const Item(name: 'Consulting'),
+          quantity: 8,
+          unitPrice: 150.00,
+          vatRate: 21,
+          unit: UnitCode.hour,
+        ),
+      ],
+);
 
 XmlElement _root(Invoice invoice) =>
     XmlDocument.parse(writeUbl(invoice)).rootElement;
@@ -181,9 +181,9 @@ void main() {
           ),
         ],
       );
-      final line = _root(invoice).childElements.firstWhere(
-            (e) => e.localName == 'InvoiceLine',
-          );
+      final line = _root(
+        invoice,
+      ).childElements.firstWhere((e) => e.localName == 'InvoiceLine');
       expect(_text(line, 'Price/PriceAmount'), '0.0125');
       expect(_text(line, 'LineExtensionAmount'), '12.50');
     });
@@ -191,9 +191,9 @@ void main() {
 
   group('a line', () {
     test('carries the quantity with its unit', () {
-      final line = _root(_invoice()).childElements.firstWhere(
-            (e) => e.localName == 'InvoiceLine',
-          );
+      final line = _root(
+        _invoice(),
+      ).childElements.firstWhere((e) => e.localName == 'InvoiceLine');
       final quantity = line.childElements.firstWhere(
         (e) => e.localName == 'InvoicedQuantity',
       );
@@ -217,9 +217,9 @@ void main() {
           ),
         ],
       );
-      final entry = _root(invoice).childElements.firstWhere(
-            (e) => e.localName == 'AllowanceCharge',
-          );
+      final entry = _root(
+        invoice,
+      ).childElements.firstWhere((e) => e.localName == 'AllowanceCharge');
       expect(_text(entry, 'ChargeIndicator'), 'false');
       expect(_text(entry, 'AllowanceChargeReasonCode'), '95');
       expect(_text(entry, 'Amount'), '50.00');

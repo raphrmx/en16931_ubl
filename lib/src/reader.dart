@@ -154,8 +154,9 @@ List<SupportingDocument> _supportingDocuments(XmlElement root) {
     final binary = attachment == null
         ? null
         : _child(attachment, 'EmbeddedDocumentBinaryObject');
-    final uri =
-        attachment == null ? null : _text(attachment, 'ExternalReference/URI');
+    final uri = attachment == null
+        ? null
+        : _text(attachment, 'ExternalReference/URI');
     documents.add(
       SupportingDocument(
         _text(reference, 'ID') ?? '',
@@ -179,7 +180,10 @@ List<SupportingDocument> _supportingDocuments(XmlElement root) {
 Seller _seller(XmlElement root) {
   final party = _child(root, 'AccountingSupplierParty/Party');
   if (party == null) {
-    return const Seller(name: '', address: Address(country: ''));
+    return const Seller(
+      name: '',
+      address: Address(country: ''),
+    );
   }
   return Seller(
     name: _text(party, 'PartyLegalEntity/RegistrationName') ?? '',
@@ -187,7 +191,7 @@ Seller _seller(XmlElement root) {
     address: _address(_child(party, 'PostalAddress')),
     identifiers: [
       for (final identification in _children(party, 'PartyIdentification'))
-        if (_identifier(identification, 'ID', 'schemeID') case final id?) id,
+        ?_identifier(identification, 'ID', 'schemeID'),
     ],
     legalRegistrationIdentifier: _identifier(
       _child(party, 'PartyLegalEntity'),
@@ -208,10 +212,14 @@ Seller _seller(XmlElement root) {
 Buyer _buyer(XmlElement root) {
   final party = _child(root, 'AccountingCustomerParty/Party');
   if (party == null) {
-    return const Buyer(name: '', address: Address(country: ''));
+    return const Buyer(
+      name: '',
+      address: Address(country: ''),
+    );
   }
   return Buyer(
-    name: _text(party, 'PartyLegalEntity/RegistrationName') ??
+    name:
+        _text(party, 'PartyLegalEntity/RegistrationName') ??
         _text(party, 'PartyName/Name') ??
         '',
     address: _address(_child(party, 'PostalAddress')),
@@ -299,8 +307,9 @@ Delivery? _delivery(XmlElement root) {
   return Delivery(
     name: _text(element, 'DeliveryParty/PartyName/Name'),
     date: _date(element, 'ActualDeliveryDate'),
-    locationIdentifier:
-        location == null ? null : _identifier(location, 'ID', 'schemeID'),
+    locationIdentifier: location == null
+        ? null
+        : _identifier(location, 'ID', 'schemeID'),
     address: location == null || _child(location, 'Address') == null
         ? null
         : _address(_child(location, 'Address')),
@@ -453,8 +462,9 @@ List<InvoiceLine> _lines(XmlElement root, {required bool creditNote}) {
   for (final element in _children(root, name)) {
     final quantity = _child(element, quantityName);
     final item = _child(element, 'Item');
-    final category =
-        item == null ? null : _child(item, 'ClassifiedTaxCategory');
+    final category = item == null
+        ? null
+        : _child(item, 'ClassifiedTaxCategory');
     lines.add(
       InvoiceLine(
         id: _text(element, 'ID') ?? '',
@@ -506,11 +516,11 @@ Item _item(XmlElement? element) {
       'schemeID',
     ),
     classificationIdentifiers: [
-      for (final classification
-          in _children(element, 'CommodityClassification'))
-        if (_identifier(classification, 'ItemClassificationCode', 'listID')
-            case final code?)
-          code,
+      for (final classification in _children(
+        element,
+        'CommodityClassification',
+      ))
+        ?_identifier(classification, 'ItemClassificationCode', 'listID'),
     ],
     originCountry: _text(element, 'OriginCountry/IdentificationCode'),
     attributes: [
@@ -530,8 +540,9 @@ Price _price(XmlElement? element) {
   final discount = _child(element, 'AllowanceCharge');
   return Price(
     netPrice: _decimal(element, 'PriceAmount') ?? Decimal.zero,
-    baseQuantity:
-        quantity == null ? null : Decimal.tryParse(quantity.innerText),
+    baseQuantity: quantity == null
+        ? null
+        : Decimal.tryParse(quantity.innerText),
     baseQuantityUnit: unit == null ? null : UnitCode(unit),
     discount: discount == null ? null : _decimal(discount, 'Amount'),
     grossPrice: discount == null ? null : _decimal(discount, 'BaseAmount'),

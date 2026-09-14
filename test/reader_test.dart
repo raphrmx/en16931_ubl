@@ -11,188 +11,186 @@ Decimal _d(String value) => Decimal.parse(value);
 /// An invoice carrying as many terms as the model has room for, so the round
 /// trip has something to lose.
 Invoice _rich() => Invoice(
-      number: '2026-0042',
-      issueDate: CalendarDate(2026, 9, 13),
-      dueDate: CalendarDate(2026, 10, 13),
-      typeCode: InvoiceTypeCode.commercialInvoice,
-      specificationIdentifier: en16931Specification,
-      businessProcess: 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',
-      currency: 'EUR',
-      vatPointDate: CalendarDate(2026, 9, 30),
-      buyerReference: 'PO-77812',
-      buyerAccountingReference: '4000',
-      projectReference: 'PRJ-1',
-      contractReference: 'CTR-9',
-      purchaseOrderReference: 'ORD-5',
-      salesOrderReference: 'SO-7',
-      despatchAdviceReference: 'DES-2',
-      receivingAdviceReference: 'REC-3',
-      tenderReference: 'TEN-4',
-      objectIdentifier: const Identifier('METER-1', scheme: 'AAU'),
-      paymentTerms: 'Payable within 30 days.',
-      notes: const [
-        InvoiceNote('Thank you.'),
-        InvoiceNote('Delivered in full.', subjectCode: 'AAI'),
-      ],
-      invoicingPeriod: DatePeriod(
+  number: '2026-0042',
+  issueDate: CalendarDate(2026, 9, 13),
+  dueDate: CalendarDate(2026, 10, 13),
+  typeCode: InvoiceTypeCode.commercialInvoice,
+  specificationIdentifier: en16931Specification,
+  businessProcess: 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',
+  currency: 'EUR',
+  vatPointDate: CalendarDate(2026, 9, 30),
+  buyerReference: 'PO-77812',
+  buyerAccountingReference: '4000',
+  projectReference: 'PRJ-1',
+  contractReference: 'CTR-9',
+  purchaseOrderReference: 'ORD-5',
+  salesOrderReference: 'SO-7',
+  despatchAdviceReference: 'DES-2',
+  receivingAdviceReference: 'REC-3',
+  tenderReference: 'TEN-4',
+  objectIdentifier: const Identifier('METER-1', scheme: 'AAU'),
+  paymentTerms: 'Payable within 30 days.',
+  notes: const [
+    InvoiceNote('Thank you.'),
+    InvoiceNote('Delivered in full.', subjectCode: 'AAI'),
+  ],
+  invoicingPeriod: DatePeriod(
+    start: CalendarDate(2026, 9, 1),
+    end: CalendarDate(2026, 9, 30),
+  ),
+  precedingInvoices: [
+    PrecedingInvoiceReference('2026-0041', issueDate: CalendarDate(2026, 8, 1)),
+  ],
+  supportingDocuments: [
+    SupportingDocument(
+      'DOC-1',
+      description: 'Timesheet',
+      attachment: Attachment(
+        bytes: Uint8List.fromList(utf8.encode('hours')),
+        mimeCode: 'application/pdf',
+        filename: 'timesheet.pdf',
+      ),
+    ),
+    SupportingDocument(
+      'DOC-2',
+      description: 'Terms',
+      externalUri: Uri.parse('https://example.be/terms'),
+    ),
+  ],
+  seller: const Seller(
+    name: 'COMAPPS SRL',
+    tradingName: 'ComApps',
+    vatIdentifier: 'BE0123456789',
+    taxRegistrationIdentifier: 'BE-TAX-1',
+    additionalLegalInformation: 'SRL, capital 20000 EUR',
+    identifiers: [Identifier('0123456789', scheme: '0208')],
+    legalRegistrationIdentifier: Identifier('0123456789', scheme: '0208'),
+    electronicAddress: Identifier('0123456789', scheme: '0208'),
+    address: Address(
+      line1: 'Rue Example 1',
+      line2: 'Box 3',
+      line3: 'Floor 2',
+      city: 'Bruxelles',
+      postalCode: '1000',
+      countrySubdivision: 'Brussels',
+      country: 'BE',
+    ),
+    contact: Contact(
+      name: 'Billing',
+      telephone: '+32 2 000 00 00',
+      email: 'billing@example.be',
+    ),
+  ),
+  buyer: const Buyer(
+    name: 'Client SA',
+    vatIdentifier: 'BE0987654321',
+    identifier: Identifier('0987654321', scheme: '0208'),
+    legalRegistrationIdentifier: Identifier('0987654321', scheme: '0208'),
+    electronicAddress: Identifier('0987654321', scheme: '0208'),
+    address: Address(
+      line1: 'Avenue Example 2',
+      city: 'Namur',
+      postalCode: '5000',
+      country: 'BE',
+    ),
+    contact: Contact(name: 'Accounts', email: 'ap@example.be'),
+  ),
+  payee: const Payee(
+    name: 'Factor SA',
+    identifier: Identifier('0111111111', scheme: '0208'),
+  ),
+  delivery: Delivery(
+    name: 'Warehouse',
+    date: CalendarDate(2026, 9, 10),
+    locationIdentifier: const Identifier('LOC-1', scheme: '0088'),
+    address: const Address(city: 'Liege', postalCode: '4000', country: 'BE'),
+  ),
+  paymentInstructions: const PaymentInstructions(
+    means: PaymentMeansCode.sepaCreditTransfer,
+    meansText: 'Bank transfer',
+    remittanceInformation: '+++090/9337/55493+++',
+    creditTransfers: [
+      CreditTransferAccount(
+        'BE68539007547034',
+        name: 'COMAPPS SRL',
+        providerBic: 'GEBABEBB',
+      ),
+    ],
+  ),
+  allowancesAndCharges: [
+    DocumentAllowanceCharge(
+      kind: AllowanceOrCharge.allowance,
+      amount: _d('50.00'),
+      baseAmount: _d('1200.00'),
+      percentage: _d('4.17'),
+      vatCategory: VatCategory.standardRate,
+      vatRate: _d('21'),
+      reason: 'Loyalty discount',
+      reasonCode: '95',
+    ),
+  ],
+  lines: [
+    InvoiceLine(
+      id: '1',
+      quantity: _d('8'),
+      unit: UnitCode.hour,
+      netAmount: _d('1200.00'),
+      note: 'September',
+      buyerOrderLineReference: '1',
+      buyerAccountingReference: '6000',
+      objectIdentifier: const Identifier('LINE-OBJ', scheme: 'AAU'),
+      period: DatePeriod(
         start: CalendarDate(2026, 9, 1),
         end: CalendarDate(2026, 9, 30),
       ),
-      precedingInvoices: [
-        PrecedingInvoiceReference('2026-0041',
-            issueDate: CalendarDate(2026, 8, 1)),
-      ],
-      supportingDocuments: [
-        SupportingDocument(
-          'DOC-1',
-          description: 'Timesheet',
-          attachment: Attachment(
-            bytes: Uint8List.fromList(utf8.encode('hours')),
-            mimeCode: 'application/pdf',
-            filename: 'timesheet.pdf',
-          ),
-        ),
-        SupportingDocument(
-          'DOC-2',
-          description: 'Terms',
-          externalUri: Uri.parse('https://example.be/terms'),
-        ),
-      ],
-      seller: const Seller(
-        name: 'COMAPPS SRL',
-        tradingName: 'ComApps',
-        vatIdentifier: 'BE0123456789',
-        taxRegistrationIdentifier: 'BE-TAX-1',
-        additionalLegalInformation: 'SRL, capital 20000 EUR',
-        identifiers: [Identifier('0123456789', scheme: '0208')],
-        legalRegistrationIdentifier: Identifier('0123456789', scheme: '0208'),
-        electronicAddress: Identifier('0123456789', scheme: '0208'),
-        address: Address(
-          line1: 'Rue Example 1',
-          line2: 'Box 3',
-          line3: 'Floor 2',
-          city: 'Bruxelles',
-          postalCode: '1000',
-          countrySubdivision: 'Brussels',
-          country: 'BE',
-        ),
-        contact: Contact(
-          name: 'Billing',
-          telephone: '+32 2 000 00 00',
-          email: 'billing@example.be',
-        ),
+      item: const Item(
+        name: 'Consulting',
+        description: 'Integration work',
+        sellerIdentifier: 'SRV-CONS',
+        buyerIdentifier: 'BUY-CONS',
+        standardIdentifier: Identifier('5412345678901', scheme: '0160'),
+        classificationIdentifiers: [Identifier('86121', scheme: 'STI')],
+        originCountry: 'BE',
+        attributes: [ItemAttribute('Seniority', 'Senior')],
       ),
-      buyer: const Buyer(
-        name: 'Client SA',
-        vatIdentifier: 'BE0987654321',
-        identifier: Identifier('0987654321', scheme: '0208'),
-        legalRegistrationIdentifier: Identifier('0987654321', scheme: '0208'),
-        electronicAddress: Identifier('0987654321', scheme: '0208'),
-        address: Address(
-          line1: 'Avenue Example 2',
-          city: 'Namur',
-          postalCode: '5000',
-          country: 'BE',
-        ),
-        contact: Contact(name: 'Accounts', email: 'ap@example.be'),
+      price: Price(
+        netPrice: _d('150.00'),
+        discount: _d('10.00'),
+        grossPrice: _d('160.00'),
+        baseQuantity: _d('1'),
+        baseQuantityUnit: UnitCode.hour,
       ),
-      payee: const Payee(
-        name: 'Factor SA',
-        identifier: Identifier('0111111111', scheme: '0208'),
-      ),
-      delivery: Delivery(
-        name: 'Warehouse',
-        date: CalendarDate(2026, 9, 10),
-        locationIdentifier: const Identifier('LOC-1', scheme: '0088'),
-        address:
-            const Address(city: 'Liege', postalCode: '4000', country: 'BE'),
-      ),
-      paymentInstructions: const PaymentInstructions(
-        means: PaymentMeansCode.sepaCreditTransfer,
-        meansText: 'Bank transfer',
-        remittanceInformation: '+++090/9337/55493+++',
-        creditTransfers: [
-          CreditTransferAccount(
-            'BE68539007547034',
-            name: 'COMAPPS SRL',
-            providerBic: 'GEBABEBB',
-          ),
-        ],
-      ),
+      vatCategory: VatCategory.standardRate,
+      vatRate: _d('21'),
       allowancesAndCharges: [
-        DocumentAllowanceCharge(
-          kind: AllowanceOrCharge.allowance,
-          amount: _d('50.00'),
-          baseAmount: _d('1200.00'),
-          percentage: _d('4.17'),
-          vatCategory: VatCategory.standardRate,
-          vatRate: _d('21'),
-          reason: 'Loyalty discount',
-          reasonCode: '95',
+        LineAllowanceCharge(
+          kind: AllowanceOrCharge.charge,
+          amount: _d('5.00'),
+          reason: 'Rush',
+          reasonCode: 'ZZZ',
         ),
       ],
-      lines: [
-        InvoiceLine(
-          id: '1',
-          quantity: _d('8'),
-          unit: UnitCode.hour,
-          netAmount: _d('1200.00'),
-          note: 'September',
-          buyerOrderLineReference: '1',
-          buyerAccountingReference: '6000',
-          objectIdentifier: const Identifier('LINE-OBJ', scheme: 'AAU'),
-          period: DatePeriod(
-            start: CalendarDate(2026, 9, 1),
-            end: CalendarDate(2026, 9, 30),
-          ),
-          item: const Item(
-            name: 'Consulting',
-            description: 'Integration work',
-            sellerIdentifier: 'SRV-CONS',
-            buyerIdentifier: 'BUY-CONS',
-            standardIdentifier: Identifier('5412345678901', scheme: '0160'),
-            classificationIdentifiers: [Identifier('86121', scheme: 'STI')],
-            originCountry: 'BE',
-            attributes: [ItemAttribute('Seniority', 'Senior')],
-          ),
-          price: Price(
-            netPrice: _d('150.00'),
-            discount: _d('10.00'),
-            grossPrice: _d('160.00'),
-            baseQuantity: _d('1'),
-            baseQuantityUnit: UnitCode.hour,
-          ),
-          vatCategory: VatCategory.standardRate,
-          vatRate: _d('21'),
-          allowancesAndCharges: [
-            LineAllowanceCharge(
-              kind: AllowanceOrCharge.charge,
-              amount: _d('5.00'),
-              reason: 'Rush',
-              reasonCode: 'ZZZ',
-            ),
-          ],
-        ),
-      ],
-      vatBreakdown: [
-        VatBreakdown(
-          category: VatCategory.standardRate,
-          taxableAmount: _d('1150.00'),
-          taxAmount: _d('241.50'),
-          rate: _d('21'),
-        ),
-      ],
-      totals: InvoiceTotals(
-        sumOfLineNetAmounts: _d('1200.00'),
-        sumOfAllowances: _d('50.00'),
-        totalWithoutVat: _d('1150.00'),
-        totalVat: _d('241.50'),
-        totalWithVat: _d('1391.50'),
-        paidAmount: _d('100.00'),
-        roundingAmount: _d('0.05'),
-        amountDueForPayment: _d('1291.55'),
-      ),
-    );
+    ),
+  ],
+  vatBreakdown: [
+    VatBreakdown(
+      category: VatCategory.standardRate,
+      taxableAmount: _d('1150.00'),
+      taxAmount: _d('241.50'),
+      rate: _d('21'),
+    ),
+  ],
+  totals: InvoiceTotals(
+    sumOfLineNetAmounts: _d('1200.00'),
+    sumOfAllowances: _d('50.00'),
+    totalWithoutVat: _d('1150.00'),
+    totalVat: _d('241.50'),
+    totalWithVat: _d('1391.50'),
+    paidAmount: _d('100.00'),
+    roundingAmount: _d('0.05'),
+    amountDueForPayment: _d('1291.55'),
+  ),
+);
 
 void main() {
   group('the round trip', () {
@@ -268,7 +266,10 @@ void main() {
           vatIdentifier: 'BE0123456789',
           address: Address(country: 'BE'),
         ),
-        buyer: const Buyer(name: 'Client SA', address: Address(country: 'BE')),
+        buyer: const Buyer(
+          name: 'Client SA',
+          address: Address(country: 'BE'),
+        ),
         lines: [
           InvoiceLine.of(
             id: '1',
@@ -295,7 +296,10 @@ void main() {
           vatIdentifier: 'BE0123456789',
           address: Address(country: 'BE'),
         ),
-        buyer: const Buyer(name: 'Client SA', address: Address(country: 'BE')),
+        buyer: const Buyer(
+          name: 'Client SA',
+          address: Address(country: 'BE'),
+        ),
         lines: [
           InvoiceLine.of(
             id: '1',
@@ -346,7 +350,9 @@ void main() {
 
     test('refuses what it cannot report on', () {
       expect(
-          () => readUbl('not xml at all'), throwsA(isA<UblFormatException>()));
+        () => readUbl('not xml at all'),
+        throwsA(isA<UblFormatException>()),
+      );
       expect(
         () => readUbl('<Order xmlns="urn:x"/>'),
         throwsA(isA<UblFormatException>()),
