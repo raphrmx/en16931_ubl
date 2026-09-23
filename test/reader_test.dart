@@ -348,6 +348,40 @@ void main() {
       expect(broken, containsAll(['BR-16', 'BR-06', 'BR-05']));
     });
 
+    test('reads a delivery that holds only its terms as no delivery', () {
+      const xml = '''
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:IssueDate>2026-09-13</cbc:IssueDate>
+  <cac:Delivery>
+    <cac:DeliveryTerms><cbc:ID>BELM-005</cbc:ID></cac:DeliveryTerms>
+  </cac:Delivery>
+</Invoice>''';
+      final invoice = readUbl(xml);
+      expect(invoice.delivery, isNull);
+    });
+
+    test('reads an attachment wrapped over several lines', () {
+      const xml = '''
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:IssueDate>2026-09-13</cbc:IssueDate>
+  <cac:AdditionalDocumentReference>
+    <cbc:ID>scan</cbc:ID>
+    <cac:Attachment>
+      <cbc:EmbeddedDocumentBinaryObject mimeCode="application/pdf" filename="scan.pdf">
+        aG91\r
+        cnMu
+      </cbc:EmbeddedDocumentBinaryObject>
+    </cac:Attachment>
+  </cac:AdditionalDocumentReference>
+</Invoice>''';
+      final attachment = readUbl(xml).supportingDocuments.single.attachment!;
+      expect(utf8.decode(attachment.bytes), 'hours.');
+    });
+
     test('refuses what it cannot report on', () {
       expect(
         () => readUbl('not xml at all'),

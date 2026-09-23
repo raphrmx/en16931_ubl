@@ -21,6 +21,7 @@ Invoice _invoice({
   InvoiceTypeCode? typeCode,
   List<InvoiceLine>? lines,
   List<DocumentAllowanceCharge> allowancesAndCharges = const [],
+  Delivery? delivery,
 }) => Invoice.fromLines(
   number: '2026-0042',
   issueDate: DateTime(2026, 9, 13),
@@ -29,6 +30,7 @@ Invoice _invoice({
   seller: _seller,
   buyer: _buyer,
   allowancesAndCharges: allowancesAndCharges,
+  delivery: delivery,
   lines:
       lines ??
       [
@@ -62,6 +64,12 @@ void main() {
       final root = _root(_invoice());
       expect(root.localName, 'Invoice');
       expect(root.namespaceUri, ublInvoice);
+    });
+
+    test('writes no delivery that would say nothing', () {
+      final root = _root(_invoice(delivery: const Delivery()));
+      final names = root.childElements.map((element) => element.localName);
+      expect(names, isNot(contains('Delivery')));
     });
 
     test('carries the header terms', () {

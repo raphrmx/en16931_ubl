@@ -1,3 +1,13 @@
+## 0.1.4
+
+- An attachment whose base64 is wrapped over several lines is read. XML
+  allows the line breaks and a mail client writes them, but the decoder
+  refused them, so reading any of the test cases UBL.BE publishes threw.
+- A delivery that holds nothing the model carries is neither read nor
+  written. A document whose delivery holds only its terms, as a Belgian one
+  carrying a legal mention does, came back with an empty delivery and went
+  out again as an empty element, which Peppol refuses.
+
 ## 0.1.3
 
 - Several payment accounts (BG-17 repeated) are written and read. UBL carries

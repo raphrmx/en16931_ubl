@@ -147,6 +147,9 @@ List<PrecedingInvoiceReference> _precedingInvoices(XmlElement root) {
   return references;
 }
 
+/// The space XML Schema allows inside a base64 value.
+final RegExp _space = RegExp(r'\s');
+
 List<SupportingDocument> _supportingDocuments(XmlElement root) {
   final documents = <SupportingDocument>[];
   for (final reference in _children(root, 'AdditionalDocumentReference')) {
@@ -166,7 +169,11 @@ List<SupportingDocument> _supportingDocuments(XmlElement root) {
         attachment: binary == null
             ? null
             : Attachment(
-                bytes: Uint8List.fromList(base64Decode(binary.innerText)),
+                // Base64 in XML may be wrapped over several lines, as a mail
+                // client writes it, and a decoder refuses the line breaks.
+                bytes: Uint8List.fromList(
+                  base64Decode(binary.innerText.replaceAll(_space, '')),
+                ),
                 mimeCode: binary.getAttribute('mimeCode') ?? '',
                 filename: binary.getAttribute('filename') ?? '',
               ),
@@ -309,15 +316,24 @@ Delivery? _delivery(XmlElement root) {
   final element = _child(root, 'Delivery');
   if (element == null) return null;
   final location = _child(element, 'DeliveryLocation');
+  final name = _text(element, 'DeliveryParty/PartyName/Name');
+  final date = _date(element, 'ActualDeliveryDate');
+  final identifier = location == null
+      ? null
+      : _identifier(location, 'ID', 'schemeID');
+  final address = location == null || _child(location, 'Address') == null
+      ? null
+      : _address(_child(location, 'Address'));
+  // A delivery can carry only what the model has no room for, the terms of
+  // delivery for one. Read as a delivery, it would be one that says nothing.
+  if (name == null && date == null && identifier == null && address == null) {
+    return null;
+  }
   return Delivery(
-    name: _text(element, 'DeliveryParty/PartyName/Name'),
-    date: _date(element, 'ActualDeliveryDate'),
-    locationIdentifier: location == null
-        ? null
-        : _identifier(location, 'ID', 'schemeID'),
-    address: location == null || _child(location, 'Address') == null
-        ? null
-        : _address(_child(location, 'Address')),
+    name: name,
+    date: date,
+    locationIdentifier: identifier,
+    address: address,
   );
 }
 

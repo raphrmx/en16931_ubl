@@ -348,7 +348,7 @@ void _contact(XmlBuilder b, Contact? contact) {
 
 void _delivery(XmlBuilder b, Invoice invoice) {
   final delivery = invoice.delivery;
-  if (delivery == null) return;
+  if (delivery == null || _isEmpty(delivery)) return;
   _group(b, 'Delivery', () {
     _text(b, 'ActualDeliveryDate', delivery.date?.toString());
     final address = delivery.address;
@@ -380,6 +380,15 @@ void _delivery(XmlBuilder b, Invoice invoice) {
     }
   });
 }
+
+/// Whether [delivery] holds nothing UBL has an element for.
+///
+/// Written anyway, it would be an empty Delivery, which Peppol refuses.
+bool _isEmpty(Delivery delivery) =>
+    delivery.name == null &&
+    delivery.date == null &&
+    delivery.locationIdentifier == null &&
+    delivery.address == null;
 
 void _payment(XmlBuilder b, Invoice invoice, String currency) {
   final instructions = invoice.paymentInstructions;
