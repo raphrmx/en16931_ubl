@@ -158,9 +158,8 @@ List<SupportingDocument> _supportingDocuments(XmlElement root) {
     final binary = attachment == null
         ? null
         : _child(attachment, 'EmbeddedDocumentBinaryObject');
-    final uri = attachment == null
-        ? null
-        : _text(attachment, 'ExternalReference/URI');
+    final uri =
+        attachment == null ? null : _text(attachment, 'ExternalReference/URI');
     documents.add(
       SupportingDocument(
         _text(reference, 'ID') ?? '',
@@ -203,7 +202,7 @@ Seller _seller(XmlElement root) {
         // scheme. It is not a party identifier, and reading it as one refuses
         // the invoice under BR-CL-10 while losing the term it really is.
         if (_scheme(identification) != sepaScheme)
-          ?_identifier(identification, 'ID', 'schemeID'),
+          if (_identifier(identification, 'ID', 'schemeID') case final id?) id,
     ],
     legalRegistrationIdentifier: _identifier(
       _child(party, 'PartyLegalEntity'),
@@ -230,8 +229,7 @@ Buyer _buyer(XmlElement root) {
     );
   }
   return Buyer(
-    name:
-        _text(party, 'PartyLegalEntity/RegistrationName') ??
+    name: _text(party, 'PartyLegalEntity/RegistrationName') ??
         _text(party, 'PartyName/Name') ??
         '',
     address: _address(_child(party, 'PostalAddress')),
@@ -318,9 +316,8 @@ Delivery? _delivery(XmlElement root) {
   final location = _child(element, 'DeliveryLocation');
   final name = _text(element, 'DeliveryParty/PartyName/Name');
   final date = _date(element, 'ActualDeliveryDate');
-  final identifier = location == null
-      ? null
-      : _identifier(location, 'ID', 'schemeID');
+  final identifier =
+      location == null ? null : _identifier(location, 'ID', 'schemeID');
   final address = location == null || _child(location, 'Address') == null
       ? null
       : _address(_child(location, 'Address'));
@@ -349,10 +346,8 @@ PaymentInstructions? _payment(XmlElement root) {
   if (groups.isEmpty) return null;
   final element = groups.first;
   final code = _child(element, 'PaymentMeansCode');
-  final card = groups
-      .map((group) => _child(group, 'CardAccount'))
-      .nonNulls
-      .firstOrNull;
+  final card =
+      groups.map((group) => _child(group, 'CardAccount')).nonNulls.firstOrNull;
   final mandate = groups
       .map((group) => _child(group, 'PaymentMandate'))
       .nonNulls
@@ -499,9 +494,8 @@ List<InvoiceLine> _lines(XmlElement root, {required bool creditNote}) {
   for (final element in _children(root, name)) {
     final quantity = _child(element, quantityName);
     final item = _child(element, 'Item');
-    final category = item == null
-        ? null
-        : _child(item, 'ClassifiedTaxCategory');
+    final category =
+        item == null ? null : _child(item, 'ClassifiedTaxCategory');
     lines.add(
       InvoiceLine(
         id: _text(element, 'ID') ?? '',
@@ -557,7 +551,9 @@ Item _item(XmlElement? element) {
         element,
         'CommodityClassification',
       ))
-        ?_identifier(classification, 'ItemClassificationCode', 'listID'),
+        if (_identifier(classification, 'ItemClassificationCode', 'listID')
+            case final id?)
+          id,
     ],
     originCountry: _text(element, 'OriginCountry/IdentificationCode'),
     attributes: [
@@ -577,9 +573,8 @@ Price _price(XmlElement? element) {
   final discount = _child(element, 'AllowanceCharge');
   return Price(
     netPrice: _decimal(element, 'PriceAmount') ?? Decimal.zero,
-    baseQuantity: quantity == null
-        ? null
-        : Decimal.tryParse(quantity.innerText),
+    baseQuantity:
+        quantity == null ? null : Decimal.tryParse(quantity.innerText),
     baseQuantityUnit: unit == null ? null : UnitCode(unit),
     discount: discount == null ? null : _decimal(discount, 'Amount'),
     grossPrice: discount == null ? null : _decimal(discount, 'BaseAmount'),

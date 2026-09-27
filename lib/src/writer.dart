@@ -1,3 +1,8 @@
+// `XmlBuilder.namespace` is deprecated in xml 7 and is the only spelling
+// xml 6 has. Writing it the 7 way would put the floor of this package
+// back on Dart 3.11, which is what xml 7 asks for.
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 
 import 'package:decimal/decimal.dart';
@@ -45,9 +50,9 @@ String writeUbl(Invoice invoice, {bool pretty = true}) {
   builder.element(
     root,
     nest: () {
-      builder.namespaceUri(null, creditNote ? ublCreditNote : ublInvoice);
-      builder.namespaceUri('cac', _cac);
-      builder.namespaceUri('cbc', _cbc);
+      builder.namespace(creditNote ? ublCreditNote : ublInvoice);
+      builder.namespace(_cac, 'cac');
+      builder.namespace(_cbc, 'cbc');
       _header(builder, invoice, creditNote: creditNote);
       _references(builder, invoice);
       _parties(builder, invoice);
@@ -168,7 +173,7 @@ void _references(XmlBuilder b, Invoice invoice) {
         if (attachment != null) {
           b.element(
             'EmbeddedDocumentBinaryObject',
-            namespaceUri: _cbc,
+            namespace: _cbc,
             attributes: {
               'mimeCode': attachment.mimeCode,
               'filename': attachment.filename,
@@ -499,7 +504,7 @@ void _line(
     _text(b, 'Note', line.note);
     b.element(
       creditNote ? 'CreditedQuantity' : 'InvoicedQuantity',
-      namespaceUri: _cbc,
+      namespace: _cbc,
       attributes: {'unitCode': line.unit.value},
       nest: line.quantity.toString(),
     );
@@ -612,7 +617,7 @@ void _price(XmlBuilder b, InvoiceLine line, String currency) {
     if (price.baseQuantity != null) {
       b.element(
         'BaseQuantity',
-        namespaceUri: _cbc,
+        namespace: _cbc,
         attributes: {
           if (price.baseQuantityUnit != null)
             'unitCode': price.baseQuantityUnit!.value,
@@ -633,12 +638,12 @@ void _price(XmlBuilder b, InvoiceLine line, String currency) {
 // --- Writing one element ---------------------------------------------------
 
 void _group(XmlBuilder b, String name, void Function() nest) {
-  b.element(name, namespaceUri: _cac, nest: nest);
+  b.element(name, namespace: _cac, nest: nest);
 }
 
 void _text(XmlBuilder b, String name, String? value) {
   if (value == null) return;
-  b.element(name, namespaceUri: _cbc, nest: value);
+  b.element(name, namespace: _cbc, nest: value);
 }
 
 void _identifier(
@@ -650,7 +655,7 @@ void _identifier(
   if (identifier == null) return;
   b.element(
     name,
-    namespaceUri: _cbc,
+    namespace: _cbc,
     attributes: {
       if (identifier.scheme != null) schemeAttribute: identifier.scheme!,
     },
@@ -673,7 +678,7 @@ void _amount(
   if (value == null) return;
   b.element(
     name,
-    namespaceUri: _cbc,
+    namespace: _cbc,
     attributes: {'currencyID': currency},
     nest: exactScale ? value.toString() : value.toStringAsFixed(2),
   );
@@ -694,7 +699,7 @@ void _paymentMeans(
   _group(b, 'PaymentMeans', () {
     b.element(
       'PaymentMeansCode',
-      namespaceUri: _cbc,
+      namespace: _cbc,
       attributes: {
         if (instructions.meansText != null) 'name': instructions.meansText!,
       },

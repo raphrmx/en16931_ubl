@@ -1,3 +1,13 @@
+## 0.1.6
+
+- The package asks for Dart 3.3 instead of 3.11, which is what carried the
+  floor: `xml` 7 requires 3.11 of its own accord. The writer builds its
+  namespaces through `XmlBuilder.namespace`, the only spelling `xml` 6 has and
+  one `xml` 7 still accepts, so the constraint spans both at `>=6.5.0 <8.0.0`.
+  A project already on `xml` 7 can still take this package.
+- The reader spells two null-aware elements as an `if`-`case`, the form that
+  reads the same and does not ask for 3.8.
+
 ## 0.1.5
 
 - `homepage` points at the package's card on comapps.web.app, which lists

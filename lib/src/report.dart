@@ -47,11 +47,9 @@ final class UblRead {
 /// signal that is true beats a wide one that cries wolf over every element
 /// the reader is right to ignore.
 const Map<String, String> ublElementsBeyondTheModel = {
-  'cac:SubInvoiceLine':
-      'a line under a line, which the XRechnung extension '
+  'cac:SubInvoiceLine': 'a line under a line, which the XRechnung extension '
       'adds as BG-DEX-01',
-  'cac:PrepaidPayment':
-      'a payment made by somebody else, which the XRechnung '
+  'cac:PrepaidPayment': 'a payment made by somebody else, which the XRechnung '
       'extension adds as BG-DEX-09',
 };
 

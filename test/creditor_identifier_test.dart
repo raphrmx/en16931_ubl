@@ -4,38 +4,38 @@ import 'package:test/test.dart';
 
 /// The invoice a direct debit is collected on.
 Invoice _invoice() => Invoice.fromLines(
-  number: '2026-0042',
-  issueDate: DateTime(2026, 9, 14),
-  dueDate: DateTime(2026, 10, 14),
-  buyerReference: 'CMD-778',
-  seller: const Seller(
-    name: 'COMAPPS SRL',
-    vatIdentifier: 'BE0123456789',
-    identifiers: [Identifier('0123456749', scheme: '0208')],
-    address: Address(city: 'Bruxelles', postalCode: '1000', country: 'BE'),
-  ),
-  buyer: const Buyer(
-    name: 'Client SA',
-    address: Address(city: 'Namur', postalCode: '5000', country: 'BE'),
-  ),
-  paymentInstructions: const PaymentInstructions(
-    means: PaymentMeansCode.sepaDirectDebit,
-    directDebit: DirectDebit(
-      mandateReference: 'MND-1',
-      creditorIdentifier: 'BE98ZZZ0123456789',
-      debitedAccountIdentifier: 'BE68539007547034',
-    ),
-  ),
-  lines: [
-    InvoiceLine.of(
-      id: '1',
-      item: const Item(name: 'Consulting'),
-      quantity: 1,
-      unitPrice: 100,
-      vatRate: 21,
-    ),
-  ],
-);
+      number: '2026-0042',
+      issueDate: DateTime(2026, 9, 14),
+      dueDate: DateTime(2026, 10, 14),
+      buyerReference: 'CMD-778',
+      seller: const Seller(
+        name: 'COMAPPS SRL',
+        vatIdentifier: 'BE0123456789',
+        identifiers: [Identifier('0123456749', scheme: '0208')],
+        address: Address(city: 'Bruxelles', postalCode: '1000', country: 'BE'),
+      ),
+      buyer: const Buyer(
+        name: 'Client SA',
+        address: Address(city: 'Namur', postalCode: '5000', country: 'BE'),
+      ),
+      paymentInstructions: const PaymentInstructions(
+        means: PaymentMeansCode.sepaDirectDebit,
+        directDebit: DirectDebit(
+          mandateReference: 'MND-1',
+          creditorIdentifier: 'BE98ZZZ0123456789',
+          debitedAccountIdentifier: 'BE68539007547034',
+        ),
+      ),
+      lines: [
+        InvoiceLine.of(
+          id: '1',
+          item: const Item(name: 'Consulting'),
+          quantity: 1,
+          unitPrice: 100,
+          vatRate: 21,
+        ),
+      ],
+    );
 
 void main() {
   group('the creditor identifier (BT-90)', () {

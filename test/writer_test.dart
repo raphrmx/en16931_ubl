@@ -22,28 +22,28 @@ Invoice _invoice({
   List<InvoiceLine>? lines,
   List<DocumentAllowanceCharge> allowancesAndCharges = const [],
   Delivery? delivery,
-}) => Invoice.fromLines(
-  number: '2026-0042',
-  issueDate: DateTime(2026, 9, 13),
-  dueDate: DateTime(2026, 10, 13),
-  typeCode: typeCode ?? InvoiceTypeCode.commercialInvoice,
-  seller: _seller,
-  buyer: _buyer,
-  allowancesAndCharges: allowancesAndCharges,
-  delivery: delivery,
-  lines:
-      lines ??
-      [
-        InvoiceLine.of(
-          id: '1',
-          item: const Item(name: 'Consulting'),
-          quantity: 8,
-          unitPrice: 150.00,
-          vatRate: 21,
-          unit: UnitCode.hour,
-        ),
-      ],
-);
+}) =>
+    Invoice.fromLines(
+      number: '2026-0042',
+      issueDate: DateTime(2026, 9, 13),
+      dueDate: DateTime(2026, 10, 13),
+      typeCode: typeCode ?? InvoiceTypeCode.commercialInvoice,
+      seller: _seller,
+      buyer: _buyer,
+      allowancesAndCharges: allowancesAndCharges,
+      delivery: delivery,
+      lines: lines ??
+          [
+            InvoiceLine.of(
+              id: '1',
+              item: const Item(name: 'Consulting'),
+              quantity: 8,
+              unitPrice: 150.00,
+              vatRate: 21,
+              unit: UnitCode.hour,
+            ),
+          ],
+    );
 
 XmlElement _root(Invoice invoice) =>
     XmlDocument.parse(writeUbl(invoice)).rootElement;

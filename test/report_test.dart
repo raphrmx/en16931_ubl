@@ -113,8 +113,7 @@ $children
 }
 
 /// A payment somebody else made, which the model has no term for.
-const String _prepaidPayment =
-    '  <cac:PrepaidPayment>\n'
+const String _prepaidPayment = '  <cac:PrepaidPayment>\n'
     '    <cbc:ID>MobilesBezahlen</cbc:ID>\n'
     '    <cbc:PaidAmount currencyID="EUR">30.00</cbc:PaidAmount>\n'
     '  </cac:PrepaidPayment>';
