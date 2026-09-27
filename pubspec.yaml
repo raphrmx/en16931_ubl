@@ -2,8 +2,8 @@ name: en16931_ubl
 description: >-
   Writes and reads the European electronic invoice as UBL 2.1, the syntax
   Peppol and most of Europe carry. Works on the EN 16931 semantic model.
-version: 0.1.4
-homepage: https://www.comapps.be
+version: 0.1.5
+homepage: https://comapps.web.app/#en16931_ubl
 repository: https://github.com/raphrmx/en16931_ubl
 issue_tracker: https://github.com/raphrmx/en16931_ubl/issues
 topics:
