@@ -1,5 +1,9 @@
 ## 0.1.7
 
+- Update dependencies
+
+## 0.1.7
+
 - `homepage` and the Live demo badge point at packages.comapps.be, where the
   demo site moved. The old address redirects there.
 - The badge row carries a PayPal donation badge, `funding` points pub.dev
